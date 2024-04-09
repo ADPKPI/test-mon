@@ -97,7 +97,7 @@ class Monitor:
     def check_response_time(self) -> float:
         return self.strategy.response_time()
 
-telnet = TelnetMonitor('78.140.189.245', 3306)
+telnet = TelnetMonitor('78.140.162.131', 5000)
 print(telnet.check())
 print(telnet.response_time())
 

@@ -135,14 +135,14 @@ class CheckManager:
         if hasattr(monitor, 'response_time'):
             try:
                 response_time = monitor.response_time()
-                print(f"{server['name']} - {check_name} Response Time: {response_time} seconds")
+                print(f"\t{check_name} Response Time: {response_time} seconds")
             except NotImplementedError:
                 pass
 
     def start(self):
         while True:
             for server in servers:
-                print(f"{server['name']} - {server['host']}:")
+                print(f"\n{server['name']} - {server['host']}:")
                 for check in server['checks']:
                     thread = Thread(target=self.run_check, args=(server, check,))
                     thread.start()

@@ -7,6 +7,10 @@ import psutil
 import telnetlib
 import time
 import paramiko
+from config import servers
+from threading import Thread
+from multiprocessing import Process
+
 
 
 class IMonitorStrategy(ABC):
@@ -107,35 +111,50 @@ class ScriptMonitor(IMonitorStrategy):
             print(f"Ошибка при подключении или выполнении команды на сервере: {e}")
             return False
 
-
-class TelegramBotMonitor(IMonitorStrategy):
-    """
-    Проверка работоспособности телеграм бота
-    """
-    # Реализация опущена для краткости
-
-class Monitor:
-    """
-    Класс мониторинга, использующий различные стратегии
-    """
-    def __init__(self, strategy: IMonitorStrategy):
-        self.strategy = strategy
-
-    def check_availability(self) -> bool:
-        return self.strategy.check()
-
-    def check_response_time(self) -> float:
-        return self.strategy.response_time()
-
-# Пример использования
-hostname = '78.140.162.131'
-port = 22
-username = 'root'
-password = '0C4k9p3l9OZiTnFrM3'
-script_name = 'main.py'
-
-monitor = ScriptMonitor(hostname, port, username, password, script_name)
-is_active = monitor.check()
-print(f"Скрипт активен: {is_active}")
+    def response_time(self) -> float:
+        # Так как измерение времени отклика может быть не применимо к этой стратегии,
+        # можно возвращать None или выбрасывать исключение.
+        raise NotImplementedError("Измерение времени отклика не поддерживается для ScriptMonitor")
 
 
+class CheckManager:
+    def run_check(self, server, check):
+        host = server.get("host")
+        check_name = check.get("name")
+
+        if check['type'] == 'ping':
+            monitor = ServerPingMonitor(host)
+        elif check['type'] == 'telnet':
+            monitor = TelnetMonitor(host, check['port'])
+        else:
+            print(f"Unknown check type: {check['type']}")
+            return
+
+        result = monitor.check()
+        print(f"{server['name']} - {check_name} Check: {'Success' if result else 'Failure'}")
+        if hasattr(monitor, 'response_time'):
+            try:
+                response_time = monitor.response_time()
+                print(f"{server['name']} - {check_name} Response Time: {response_time} seconds")
+            except NotImplementedError:
+                pass
+
+    def start(self):
+        while True:
+            for server in servers:
+                for check in server['checks']:
+                    thread = Thread(target=self.run_check, args=(server, check,))
+                    thread.start()
+                    thread.join()
+            time.sleep(60)  # Wait for 1 minute before next round of checks
+
+
+def start_monitoring():
+    manager = CheckManager()
+    manager.start()
+
+if __name__ == "__main__":
+    monitoring_process = Process(target=start_monitoring)
+    monitoring_process.start()
+
+    monitoring_process.join()

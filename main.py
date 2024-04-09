@@ -176,7 +176,6 @@ class CheckManager:
         elif check['type'] == 'disk_space':
             monitor = DiskMonitor()
         else:
-            print(f"Unknown check type: {check['type']}")
             return
 
         result = monitor.check()
@@ -195,7 +194,11 @@ class CheckManager:
             logger.addHandler(handler)
 
         # Логирование результата проверки
-        logger.info(f"{check_name} --- {'Success' if result else 'Failure'}{f' Response Time: {round(response_time,3)} seconds' if response_time is not None else ''}")
+        if(check_name in ["CPU", "RAM", "DISK SPACE"]):
+            logger.info(
+                f"{check_name} --- {'Success' if result else 'Failure'} | {f'Usage: {round(response_time, 3)}%' if response_time is not None else ''}")
+        else:
+            logger.info(f"{check_name} --- {'Success' if result else 'Failure'} | {f' Response Time: {round(response_time,3)} seconds' if response_time is not None else ''}")
 
         # Обновление агрегированных результатов
         self.aggregate_results[server_name] = self.aggregate_results.get(server_name, []) + [{

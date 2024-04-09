@@ -159,6 +159,9 @@ class DiskMonitor(IMonitorStrategy):
 
 
 class CheckManager:
+    def __init__(self):
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+        self.aggregate_results = {}
     def run_check(self, server, check):
         host = server.get("host")
         check_name = check.get("name")

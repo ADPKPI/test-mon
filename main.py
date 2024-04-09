@@ -126,6 +126,8 @@ class CheckManager:
             monitor = ServerPingMonitor(host)
         elif check['type'] == 'telnet':
             monitor = TelnetMonitor(host, check['port'])
+        elif check['type'] == 'script':
+            monitor = ScriptMonitor(host, 22, server['user'], server['password'], check['script'])
         else:
             print(f"Unknown check type: {check['type']}")
             return

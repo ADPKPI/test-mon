@@ -34,5 +34,27 @@ servers = [
             {"type": "telnet", "name": "MySQL", "port": 3306},
             {"type": "telnet", "name": "SSH", "port": 22}
         ]
+    },
+    {
+        "name": "TG1",
+        "host": "78.140.189.246",
+        "user": "root",
+        "password":"5q9fAM56B5iBL7wsoN",
+        "checks": [
+            {"type": "ping", "name": "PING"},
+            {"type": "telnet", "name": "SSH", "port": 22},
+            {"type": "script", "name": "Bot Script", "script": "initialization.py"}
+        ]
+    },
+    {
+        "name": "BACKUPS",
+        "host": "78.140.162.131",
+        "user": "root",
+        "password": "0C4k9p3l9OZiTnFrM3",
+        "checks": [
+            {"type": "ping", "name": "PING"},
+            {"type": "telnet", "name": "SSH", "port": 22},
+            {"type": "script", "name": "Bot Script", "script": "main.py"}
+        ]
     }
 ]

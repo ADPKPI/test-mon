@@ -4,6 +4,9 @@ import socket
 import requests
 import os
 import psutil
+import telnetlib
+import time
+
 
 class IMonitorStrategy(ABC):
     """
@@ -21,15 +24,15 @@ class ServerPingMonitor(IMonitorStrategy):
     """
     Мониторинг сервера через ping
     """
-    def __init__(self, address):
-        self.address = address
+    def __init__(self, host):
+        self.host = host
 
     def check(self) -> bool:
-        response = subprocess.run(['ping', '-c', '1', self.address], stdout=subprocess.PIPE)
+        response = subprocess.run(['ping', '-c', '1', self.host], stdout=subprocess.PIPE)
         return response.returncode == 0
 
     def response_time(self) -> float:
-        response = subprocess.run(['ping', '-c', '1', self.address], stdout=subprocess.PIPE)
+        response = subprocess.run(['ping', '-c', '1', self.host], stdout=subprocess.PIPE)
         output = response.stdout.decode('cp1251')
         time_pos = output.find('time=')
         if time_pos != -1:
@@ -38,11 +41,30 @@ class ServerPingMonitor(IMonitorStrategy):
             return float(output[start:end])
         return -1.0
 
-class MySQLMonitor(IMonitorStrategy):
-    """
-    Мониторинг СУБД MySQL через телнет
-    """
-    # Реализация опущена для краткости
+class TelnetMonitor(IMonitorStrategy):
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port
+
+    def check(self) -> bool:
+        try:
+            with telnetlib.Telnet(self.host, self.port, timeout=10) as tn:
+                tn.read_until(b"mysql>", timeout=10)
+            return True
+        except:
+            return False
+
+    def response_time(self) -> float:
+        start_time = time.time()
+        try:
+            with telnetlib.Telnet(self.host, self.port, timeout=10) as tn:
+                tn.read_until(b"mysql>", timeout=10)
+                end_time = time.time()
+                return end_time - start_time
+        except:
+            end_time = time.time()
+            print(f"Failed to connect to {self.host}:{self.port}")
+            return end_time - start_time
 
 class APIMonitor(IMonitorStrategy):
     """
@@ -75,6 +97,8 @@ class Monitor:
     def check_response_time(self) -> float:
         return self.strategy.response_time()
 
-ping_monitor = ServerPingMonitor('78.140.189.245')
-print(ping_monitor.check())
-print(ping_monitor.response_time())
+telnet = TelnetMonitor('78.140.189.245', 3306)
+print(telnet.check())
+print(telnet.response_time())
+
+

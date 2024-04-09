@@ -48,7 +48,7 @@ class TelnetMonitor:
 
     def check(self) -> bool:
         try:
-            with telnetlib.Telnet(self.host, self.port) as tn:
+            with telnetlib.Telnet(self.host, self.port, timeout=10) as tn:
                 # Просто устанавливаем соединение, без ожидания конкретного ответа
                 return True
         except Exception as e:
@@ -58,7 +58,7 @@ class TelnetMonitor:
     def response_time(self) -> float:
         try:
             start_time = time.time()
-            with telnetlib.Telnet(self.host, self.port) as tn:
+            with telnetlib.Telnet(self.host, self.port, timeout=10) as tn:
                 end_time = time.time()
                 return end_time - start_time
         except Exception as e:

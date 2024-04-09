@@ -115,9 +115,7 @@ class ScriptMonitor(IMonitorStrategy):
             return False
 
     def response_time(self) -> float:
-        # Так как измерение времени отклика может быть не применимо к этой стратегии,
-        # можно возвращать None или выбрасывать исключение.
-        raise NotImplementedError("Измерение времени отклика не поддерживается для ScriptMonitor")
+        return 0
 
 
 class CPUMonitor(IMonitorStrategy):

@@ -60,7 +60,7 @@ class TelnetMonitor(IMonitorStrategy):
                 # Просто устанавливаем соединение, без ожидания конкретного ответа
                 return True
         except Exception as e:
-            print(f"Error connecting to {self.host}:{self.port}: {e}")
+            logging.error(f"Error connecting to {self.host}:{self.port}: {e}")
             return False
 
     def response_time(self) -> float:
@@ -71,7 +71,7 @@ class TelnetMonitor(IMonitorStrategy):
                 return end_time - start_time
         except Exception as e:
             end_time = time.time()
-            print(f"Failed to connect to {self.host}:{self.port}: {e}")
+            logging.error(f"Failed to connect to {self.host}:{self.port}: {e}")
             return end_time - start_time
 
 
@@ -111,7 +111,7 @@ class ScriptMonitor(IMonitorStrategy):
 
             return len(output) > 0
         except Exception as e:
-            print(f"Ошибка при подключении или выполнении команды на сервере: {e}")
+            logging.error(f"Ошибка при подключении или выполнении команды на сервере: {e}")
             return False
 
     def response_time(self) -> float:
@@ -129,7 +129,6 @@ class CPUMonitor(IMonitorStrategy):
         # Получаем среднюю загрузку CPU за последнюю минуту
         load1, _, _ = psutil.getloadavg()
         cpu_usage = (load1 / psutil.cpu_count()) * 100
-        print(f"CPU Usage: {cpu_usage:.2f}%")
         return cpu_usage
 
 class RAMMonitor(IMonitorStrategy):
@@ -140,7 +139,6 @@ class RAMMonitor(IMonitorStrategy):
     def response_time(self) -> float:
         # Использование оперативной памяти в процентах
         mem = psutil.virtual_memory()
-        print(f"RAM Usage: {mem.percent}%")
         return mem.percent
 
 class DiskMonitor(IMonitorStrategy):
@@ -154,7 +152,6 @@ class DiskMonitor(IMonitorStrategy):
     def response_time(self) -> float:
         # Использование дискового пространства в процентах для указанного раздела
         usage = psutil.disk_usage(self.disk)
-        print(f"Disk Usage for {self.disk}: {usage.percent}%")
         return usage.percent
 
 
@@ -216,7 +213,6 @@ class CheckManager:
     def start(self):
         while True:
             for server in servers:
-                print(f"\n\n{server['name']} - {server['host']}:")
                 for check in server['checks']:
                     thread = Thread(target=self.run_check, args=(server, check,))
                     thread.start()

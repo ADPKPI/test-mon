@@ -5,7 +5,10 @@ servers = [
         "checks": [
             {"type": "ping", "name": "PING"},
             {"type": "telnet", "name": "MySQL", "port": 3306},
-            {"type": "telnet", "name": "SSH", "port": 22}
+            {"type": "telnet", "name": "SSH", "port": 22},
+            {"type": "cpu", "name": "CPU"},
+            {"type": "ram", "name": "RAM"},
+            {"type": "disk_space", "name": "DISK SPACE"}
         ]
     },
     {
@@ -14,7 +17,10 @@ servers = [
         "checks": [
             {"type": "ping", "name": "PING"},
             {"type": "telnet", "name": "MySQL", "port": 3306},
-            {"type": "telnet", "name": "SSH", "port": 22}
+            {"type": "telnet", "name": "SSH", "port": 22},
+            {"type": "cpu", "name": "CPU"},
+            {"type": "ram", "name": "RAM"},
+            {"type": "disk_space", "name": "DISK SPACE"}
         ]
     },
     {
@@ -23,7 +29,10 @@ servers = [
         "checks": [
             {"type": "ping", "name": "PING"},
             {"type": "telnet", "name": "MySQL", "port": 3306},
-            {"type": "telnet", "name": "SSH", "port": 22}
+            {"type": "telnet", "name": "SSH", "port": 22},
+            {"type": "cpu", "name": "CPU"},
+            {"type": "ram", "name": "RAM"},
+            {"type": "disk_space", "name": "DISK SPACE"}
         ]
     },
     {
@@ -32,7 +41,10 @@ servers = [
         "checks": [
             {"type": "ping", "name": "PING"},
             {"type": "telnet", "name": "MySQL", "port": 3306},
-            {"type": "telnet", "name": "SSH", "port": 22}
+            {"type": "telnet", "name": "SSH", "port": 22},
+            {"type": "cpu", "name": "CPU"},
+            {"type": "ram", "name": "RAM"},
+            {"type": "disk_space", "name": "DISK SPACE"}
         ]
     },
     {
@@ -43,7 +55,10 @@ servers = [
         "checks": [
             {"type": "ping", "name": "PING"},
             {"type": "telnet", "name": "SSH", "port": 22},
-            {"type": "script", "name": "Bot Script", "script": "initialization.py"}
+            {"type": "script", "name": "Bot", "script": "initialization.py"},
+            {"type": "cpu", "name": "CPU"},
+            {"type": "ram", "name": "RAM"},
+            {"type": "disk_space", "name": "DISK SPACE"}
         ]
     },
     {
@@ -54,7 +69,10 @@ servers = [
         "checks": [
             {"type": "ping", "name": "PING"},
             {"type": "telnet", "name": "SSH", "port": 22},
-            {"type": "script", "name": "Bot Script", "script": "main.py"}
+            {"type": "script", "name": "Backup Service", "script": "main.py"},
+            {"type": "cpu", "name": "CPU"},
+            {"type": "ram", "name": "RAM"},
+            {"type": "disk_space", "name": "DISK SPACE"}
         ]
     }
 ]

@@ -46,7 +46,7 @@ class ServerPingMonitor(IMonitorStrategy):
             return float(output[start:end])
         return -1.0
 
-class TelnetMonitor:
+class TelnetMonitor(IMonitorStrategy):
     def __init__(self, host, port):
         self.host = host
         self.port = port
@@ -117,6 +117,44 @@ class ScriptMonitor(IMonitorStrategy):
         raise NotImplementedError("Измерение времени отклика не поддерживается для ScriptMonitor")
 
 
+class CPUMonitor(IMonitorStrategy):
+    def check(self) -> bool:
+        # В данном случае `check` может возвращать True, если удалось получить данные
+        return True
+
+    def response_time(self) -> float:
+        # Получаем среднюю загрузку CPU за последнюю минуту
+        load1, _, _ = psutil.getloadavg()
+        cpu_usage = (load1 / psutil.cpu_count()) * 100
+        print(f"CPU Usage: {cpu_usage:.2f}%")
+        return cpu_usage
+
+class RAMMonitor(IMonitorStrategy):
+    def check(self) -> bool:
+        # Аналогично, возвращает True, если получение информации об успешном
+        return True
+
+    def response_time(self) -> float:
+        # Использование оперативной памяти в процентах
+        mem = psutil.virtual_memory()
+        print(f"RAM Usage: {mem.percent}%")
+        return mem.percent
+
+class DiskMonitor(IMonitorStrategy):
+    def __init__(self, disk='/'):
+        self.disk = disk
+
+    def check(self) -> bool:
+        # Возвращает True, если удалось получить информацию о диске
+        return True
+
+    def response_time(self) -> float:
+        # Использование дискового пространства в процентах для указанного раздела
+        usage = psutil.disk_usage(self.disk)
+        print(f"Disk Usage for {self.disk}: {usage.percent}%")
+        return usage.percent
+
+
 class CheckManager:
     def run_check(self, server, check):
         host = server.get("host")
@@ -128,6 +166,12 @@ class CheckManager:
             monitor = TelnetMonitor(host, check['port'])
         elif check['type'] == 'script':
             monitor = ScriptMonitor(host, 22, server['user'], server['password'], check['script'])
+        elif check['type'] == 'cpu':
+            monitor = CPUMonitor()
+        elif check['type'] == 'ram':
+            monitor = RAMMonitor()
+        elif check['type'] == 'disk_space':
+            monitor = DiskMonitor()
         else:
             print(f"Unknown check type: {check['type']}")
             return

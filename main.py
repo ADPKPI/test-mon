@@ -10,6 +10,9 @@ import paramiko
 from config import servers
 from threading import Thread
 from multiprocessing import Process
+import logging
+import json
+from datetime import datetime
 
 
 
@@ -177,13 +180,35 @@ class CheckManager:
             return
 
         result = monitor.check()
-        print(f"\t{check_name} --- {'Success' if result else 'Failure'}")
-        if hasattr(monitor, 'response_time'):
-            try:
-                response_time = monitor.response_time()
-                print(f"\t{check_name} Response Time: {round(response_time,3)} seconds\n")
-            except NotImplementedError:
-                pass
+        response_time = monitor.response_time()
+
+        self.log_result(server["name"], check["name"], result, response_time)
+
+
+    def log_result(self, server_name, check_name, result, response_time=None):
+        # Создание или обновление логгера для каждого сервера
+        logger = logging.getLogger(server_name)
+        if not logger.handlers:
+            # Установка файла для логирования результатов каждого сервера
+            handler = logging.FileHandler(f"logs/{server_name}_checks.log")
+            handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s', '%Y-%m-%d %H:%M:%S'))
+            logger.addHandler(handler)
+
+        # Логирование результата проверки
+        logger.info(f"{check_name} --- {'Success' if result else 'Failure'}{f' Response Time: {round(response_time,3)} seconds' if response_time is not None else ''}")
+
+        # Обновление агрегированных результатов
+        self.aggregate_results[server_name] = self.aggregate_results.get(server_name, []) + [{
+            "check_name": check_name,
+            "result": 'Success' if result else 'Failure',
+            "response_time": round(response_time, 3) if response_time is not None else None,
+            "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }]
+
+    def save_aggregate_results(self):
+        # Сохранение агрегированных результатов в JSON файл
+        with open("aggregate_results.json", "w") as json_file:
+            json.dump(self.aggregate_results, json_file, indent=4)
 
     def start(self):
         while True:
@@ -193,6 +218,8 @@ class CheckManager:
                     thread = Thread(target=self.run_check, args=(server, check,))
                     thread.start()
                     thread.join()
+
+            self.save_aggregate_results()
             time.sleep(60)  # Wait for 1 minute before next round of checks
 
 

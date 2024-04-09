@@ -131,7 +131,7 @@ class CheckManager:
             return
 
         result = monitor.check()
-        print(f"{server['name']} - {check_name} Check: {'Success' if result else 'Failure'}")
+        print(f"\t{check_name} --- {'Success' if result else 'Failure'}")
         if hasattr(monitor, 'response_time'):
             try:
                 response_time = monitor.response_time()
@@ -142,6 +142,7 @@ class CheckManager:
     def start(self):
         while True:
             for server in servers:
+                print(f"{server['name']} - {server['host']}:")
                 for check in server['checks']:
                     thread = Thread(target=self.run_check, args=(server, check,))
                     thread.start()

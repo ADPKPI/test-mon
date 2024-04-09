@@ -41,7 +41,7 @@ class ServerPingMonitor(IMonitorStrategy):
             return float(output[start:end])
         return -1.0
 
-class TelnetMonitor(IMonitorStrategy):
+class TelnetMonitor:
     def __init__(self, host, port):
         self.host = host
         self.port = port
@@ -49,21 +49,21 @@ class TelnetMonitor(IMonitorStrategy):
     def check(self) -> bool:
         try:
             with telnetlib.Telnet(self.host, self.port, timeout=10) as tn:
-                tn.read_until(b"mysql>", timeout=10)
-            return True
-        except:
+                # Просто устанавливаем соединение, без ожидания конкретного ответа
+                return True
+        except Exception as e:
+            print(f"Error connecting to {self.host}:{self.port}: {e}")
             return False
 
     def response_time(self) -> float:
-        start_time = time.time()
         try:
+            start_time = time.time()
             with telnetlib.Telnet(self.host, self.port, timeout=10) as tn:
-                tn.read_until(b"mysql>", timeout=10)
                 end_time = time.time()
                 return end_time - start_time
-        except:
+        except Exception as e:
             end_time = time.time()
-            print(f"Failed to connect to {self.host}:{self.port}")
+            print(f"Failed to connect to {self.host}:{self.port}: {e}")
             return end_time - start_time
 
 class APIMonitor(IMonitorStrategy):

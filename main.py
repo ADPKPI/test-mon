@@ -6,6 +6,7 @@ import os
 import psutil
 import telnetlib
 import time
+import paramiko
 
 
 class IMonitorStrategy(ABC):
@@ -66,17 +67,46 @@ class TelnetMonitor:
             print(f"Failed to connect to {self.host}:{self.port}: {e}")
             return end_time - start_time
 
-class APIMonitor(IMonitorStrategy):
-    """
-    Мониторинг доступности API по определенному порту
-    """
-    # Реализация опущена для краткости
 
 class ScriptMonitor(IMonitorStrategy):
     """
-    Проверка активности Python скрипта на сервере
-    """
-    # Реализация опущена для краткости
+       Проверка активности Python скрипта на удаленном сервере через SSH.
+       """
+
+    def __init__(self, hostname, port, username, password, script_name):
+        """
+        Инициализация монитора.
+        :param hostname: Имя хоста или IP адрес удаленного сервера.
+        :param port: Порт SSH.
+        :param username: Имя пользователя для SSH соединения.
+        :param password: Пароль пользователя для SSH соединения.
+        :param script_name: Имя скрипта для мониторинга.
+        """
+        self.hostname = hostname
+        self.port = port
+        self.username = username
+        self.password = password
+        self.script_name = script_name
+
+    def check(self) -> bool:
+        """
+        Выполняет проверку активности скрипта на удаленном сервере.
+        :return: True, если скрипт активен, иначе False.
+        """
+        command = f"ps aux | grep python | grep -v grep | grep {self.script_name}"
+        try:
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect(self.hostname, port=self.port, username=self.username, password=self.password)
+            stdin, stdout, stderr = ssh.exec_command(command)
+            output = stdout.readlines()
+            ssh.close()
+
+            return len(output) > 0
+        except Exception as e:
+            print(f"Ошибка при подключении или выполнении команды на сервере: {e}")
+            return False
+
 
 class TelegramBotMonitor(IMonitorStrategy):
     """
@@ -97,8 +127,15 @@ class Monitor:
     def check_response_time(self) -> float:
         return self.strategy.response_time()
 
-telnet = TelnetMonitor('78.140.162.131', 5000)
-print(telnet.check())
-print(telnet.response_time())
+# Пример использования
+hostname = '78.140.162.131'
+port = 22
+username = 'root'
+password = '0C4k9p3l9OZiTnFrM3'
+script_name = 'main.py'
+
+monitor = ScriptMonitor(hostname, port, username, password, script_name)
+is_active = monitor.check()
+print(f"Скрипт активен: {is_active}")
 
 

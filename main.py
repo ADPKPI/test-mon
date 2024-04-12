@@ -199,14 +199,14 @@ class CheckManager:
         else:
             logger.info(f"{check_name} --- {'Success' if result else 'Failure'} | {f' Response Time: {round(response_time,3)} seconds' if response_time is not None else ''}")
 
-        # Обновление агрегированных результатов
-            self.aggregate_results[server_name] = [{
-                "check_name": check_name,
-                "result": 'Success' if result else 'Failure',
-                "response_time": round(response_time, 3) if response_time is not None else None,
-                "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            }]
-
+        if server_name not in self.aggregate_results:
+            self.aggregate_results[server_name] = []
+        self.aggregate_results[server_name].append({
+            "check_name": check_name,
+            "result": 'Success' if result else 'Failure',
+            "response_time": round(response_time, 3) if response_time is not None else None,
+            "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        })
     def save_aggregate_results(self):
         # Сохранение агрегированных результатов в JSON файл с перезаписью
         with open("aggregate_results.json", "w") as json_file:

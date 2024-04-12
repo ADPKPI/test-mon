@@ -13,6 +13,7 @@ from multiprocessing import Process
 import logging
 import json
 from datetime import datetime
+from api import app
 
 
 
@@ -228,6 +229,8 @@ def start_monitoring():
     manager.start()
 
 if __name__ == "__main__":
+    app.run(debug=True, host='206.54.170.102', port=5000)
+
     monitoring_process = Process(target=start_monitoring)
     monitoring_process.start()
 

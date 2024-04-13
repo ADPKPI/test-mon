@@ -210,7 +210,8 @@ class CheckManager:
     def save_aggregate_results(self):
         # Сохранение агрегированных результатов в JSON файл с перезаписью
         with open("aggregate_results.json", "w") as json_file:
-            json.dump(self.aggregate_results, json_file, indent=4)
+            json_str = json.dumps(self.aggregate_results, indent=4)
+            json_file.write(json_str)
 
     def start(self):
         while True:

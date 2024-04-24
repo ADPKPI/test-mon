@@ -16,6 +16,7 @@ import logging
 import json
 from datetime import datetime
 from api import app
+from handlers import StrategyFactory
 
 
 
@@ -159,6 +160,7 @@ class DiskMonitor(IMonitorStrategy):
 class CheckManager:
     def __init__(self):
         logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+        self.handlers = StrategyFactory()
         self.aggregate_results = {}
         self.threads = []
 
@@ -217,7 +219,10 @@ class CheckManager:
         })
 
     def handle_failure(self, server_name, check_name):
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        with open('aggregate_results.json', 'r') as file:
+            data = json.load(file)
+        handler = self.handlers.get_strategy(server_name, check_name, data)
+        handler.handle(server_name, check_name)
 
     def handle_warning(self, server_name, check_name, value):
         print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")

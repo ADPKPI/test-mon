@@ -160,47 +160,43 @@ class CheckManager:
     def __init__(self):
         logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         self.aggregate_results = {}
+        self.threads = []
+
     def run_check(self, server, check):
         host = server.get("host")
         check_name = check.get("name")
+        try:
+            if check['type'] == 'ping':
+                monitor = ServerPingMonitor(host)
+            elif check['type'] == 'telnet':
+                monitor = TelnetMonitor(host, check['port'])
+            elif check['type'] == 'script':
+                monitor = ScriptMonitor(host, 22, server['user'], server['password'], check['script'])
+            elif check['type'] == 'cpu':
+                monitor = CPUMonitor()
+            elif check['type'] == 'ram':
+                monitor = RAMMonitor()
+            elif check['type'] == 'disk_space':
+                monitor = DiskMonitor()
+            else:
+                return
 
-        if check['type'] == 'ping':
-            monitor = ServerPingMonitor(host)
-        elif check['type'] == 'telnet':
-            monitor = TelnetMonitor(host, check['port'])
-        elif check['type'] == 'script':
-            monitor = ScriptMonitor(host, 22, server['user'], server['password'], check['script'])
-        elif check['type'] == 'cpu':
-            monitor = CPUMonitor()
-        elif check['type'] == 'ram':
-            monitor = RAMMonitor()
-        elif check['type'] == 'disk_space':
-            monitor = DiskMonitor()
-        else:
-            return
-
-        result = monitor.check()
-        response_time = monitor.response_time()
-
-        self.log_result(server["name"], check["name"], result, response_time)
-
+            result = monitor.check()
+            response_time = monitor.response_time()
+            self.log_result(server["name"], check["name"], result, response_time)
+            if not result:
+                self.handle_failure(server["name"], check["name"])
+        except Exception as e:
+            logging.error(e)
 
     def log_result(self, server_name, check_name, result, response_time=None):
-        # Создание или обновление логгера для каждого сервера
         logger = logging.getLogger(server_name)
         if not logger.handlers:
-            # Установка файла для логирования результатов каждого сервера
             handler = logging.FileHandler(f"logs/{server_name}_checks.log")
             handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s', '%Y-%m-%d %H:%M:%S'))
             logger.addHandler(handler)
 
-        # Логирование результата проверки
-        if(check_name in ["CPU", "RAM", "DISK SPACE"]):
-            logger.info(
-                f"{server_name} --- {check_name} --- {'Success' if result else 'Failure'} | {f'Usage: {round(response_time, 3)}%' if response_time is not None else ''}")
-        else:
-            logger.info(f"{server_name} --- {check_name} --- {'Success' if result else 'Failure'} | {f' Response Time: {round(response_time,3)} seconds' if response_time is not None else ''}")
-
+        logger.info(f"{check_name} --- {'Success' if result else 'Failure'} | {f' Response Time: {round(response_time,3)} seconds' if response_time is not None else ''}")
         if server_name not in self.aggregate_results:
             self.aggregate_results[server_name] = []
         self.aggregate_results[server_name].append({
@@ -209,8 +205,11 @@ class CheckManager:
             "response_time": round(response_time, 3) if response_time is not None else None,
             "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         })
+
+    def handle_failure(self, server_name, check_name):
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+
     def save_aggregate_results(self):
-        # Сохранение агрегированных результатов в JSON файл с перезаписью
         with open("aggregate_results.json", "w") as json_file:
             json_str = json.dumps(self.aggregate_results, indent=4)
             json_file.write(json_str)
@@ -220,12 +219,15 @@ class CheckManager:
             for server in servers:
                 for check in server['checks']:
                     thread = Thread(target=self.run_check, args=(server, check,))
+                    self.threads.append(thread)
                     thread.start()
-                    thread.join()
+
+            for thread in self.threads:
+                thread.join()  # Ensure all threads have completed
 
             self.save_aggregate_results()
-            time.sleep(60)
-
+            self.threads = []  # Reset the thread list for the next cycle
+            time.sleep(60)  # Wait for 1 minute before next round of checks
 
 def start_monitoring():
     manager = CheckManager()

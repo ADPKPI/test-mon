@@ -224,7 +224,7 @@ class CheckManager:
                     thread.join()
 
             self.save_aggregate_results()
-            time.sleep(60)  # Wait for 1 minute before next round of checks
+            time.sleep(60)
 
 
 def start_monitoring():
@@ -232,9 +232,4 @@ def start_monitoring():
     manager.start()
 
 if __name__ == "__main__":
-    app.run(debug=True, host='206.54.170.102', port=5000)
-
-    monitoring_process = Process(target=start_monitoring)
-    monitoring_process.start()
-
-    monitoring_process.join()
+    start_monitoring()

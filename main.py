@@ -9,7 +9,7 @@ import psutil
 import telnetlib
 import time
 import paramiko
-from config import servers
+from config import servers, resourse_limits, response_time_limit
 from threading import Thread
 from multiprocessing import Process
 import logging
@@ -184,7 +184,12 @@ class CheckManager:
             result = monitor.check()
             response_time = monitor.response_time()
             self.log_result(server["name"], check["name"], result, response_time)
-            if not result:
+            if check['type'] not in 'cpu ram disk_space':
+                if not result:
+                    self.handle_failure(server["name"], check["name"])
+                elif response_time >= response_time_limit:
+                    self.handle_warning(server["name"], check["name"], response_time)
+            elif check['type'] in 'cpu ram disk_space' and response_time >= resourse_limits[check_name]:
                 self.handle_failure(server["name"], check["name"])
         except Exception as e:
             logging.error(e)
@@ -213,6 +218,9 @@ class CheckManager:
 
     def handle_failure(self, server_name, check_name):
         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+
+    def handle_warning(self, server_name, check_name, value):
+        print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
     def save_aggregate_results(self):
         with open("aggregate_results.json", "w") as json_file:

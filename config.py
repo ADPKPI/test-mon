@@ -1,3 +1,10 @@
+response_time_limit = 0.5
+resourse_limits = {
+    "CPU":75,
+    "RAM":75,
+    "DISK SPACE":75
+}
+
 servers = [
     {
         "name": "DB-master1",

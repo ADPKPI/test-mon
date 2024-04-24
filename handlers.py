@@ -21,6 +21,6 @@ class NotifyStrategy(FailureHandlingStrategy):
     def handle(self, server_name, check_name):
         try:
             for id in chats:
-                self.bot.send_message(chat_id=id, text=f"ТРЕВОГААААААААААААААААААААААААААААААААААААА {server_name} - {check_name} НАЕБНУЛСЯ!!!")
+                await self.bot.send_message(chat_id=id, text=f"ТРЕВОГААААААААААААААААААААААААААААААААААААА {server_name} - {check_name} НАЕБНУЛСЯ!!!")
         except Exception as e:
             logging.error(f"Failed to send Telegram message: {e}")

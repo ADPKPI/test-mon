@@ -197,9 +197,9 @@ class CheckManager:
         # Логирование результата проверки
         if(check_name in ["CPU", "RAM", "DISK SPACE"]):
             logger.info(
-                f"{check_name} --- {'Success' if result else 'Failure'} | {f'Usage: {round(response_time, 3)}%' if response_time is not None else ''}")
+                f"{server_name} --- {check_name} --- {'Success' if result else 'Failure'} | {f'Usage: {round(response_time, 3)}%' if response_time is not None else ''}")
         else:
-            logger.info(f"{check_name} --- {'Success' if result else 'Failure'} | {f' Response Time: {round(response_time,3)} seconds' if response_time is not None else ''}")
+            logger.info(f"{server_name} --- {check_name} --- {'Success' if result else 'Failure'} | {f' Response Time: {round(response_time,3)} seconds' if response_time is not None else ''}")
 
         if server_name not in self.aggregate_results:
             self.aggregate_results[server_name] = []

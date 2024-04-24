@@ -3,7 +3,6 @@ from telegram import Bot
 import logging
 import os
 from config import chats
-import asyncio
 
 class FailureHandlingStrategy:
     def handle(self, server_name, check_name, error):

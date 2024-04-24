@@ -17,6 +17,7 @@ import json
 from datetime import datetime
 from api import app
 from handlers import StrategyFactory
+import asyncio
 
 
 
@@ -222,7 +223,7 @@ class CheckManager:
         with open('aggregate_results.json', 'r') as file:
             data = json.load(file)
         handler = self.handlers.get_strategy(server_name, check_name, data)
-        handler.handle(server_name, check_name)
+        asyncio.run(handler.handle(server_name, check_name))
 
     def handle_warning(self, server_name, check_name, value):
         print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")

@@ -196,7 +196,12 @@ class CheckManager:
             handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s', '%Y-%m-%d %H:%M:%S'))
             logger.addHandler(handler)
 
-        logger.info(f"{check_name} --- {'Success' if result else 'Failure'} | {f' Response Time: {round(response_time,3)} seconds' if response_time is not None else ''}")
+        if (check_name in ["CPU", "RAM", "DISK SPACE"]):
+            logger.info(
+                f"{server_name} --- {check_name} --- {'Success' if result else 'Failure'} | {f'Usage: {round(response_time, 3)}%' if response_time is not None else ''}")
+        else:
+            logger.info(
+                f"{server_name} --- {check_name} --- {'Success' if result else 'Failure'} | {f' Response Time: {round(response_time, 3)} seconds' if response_time is not None else ''}")
         if server_name not in self.aggregate_results:
             self.aggregate_results[server_name] = []
         self.aggregate_results[server_name].append({

@@ -10,6 +10,6 @@ class StrategyFactory:
 
 class NotifyStrategy(FailureHandlingStrategy):
     def handle(self, server_name, check_name):
-        send_message_to_chats(f"ТРЕВОГААААААААААААААААААААААААААА\n{server_name} наебнулся")
+        await send_message_to_chats(f"ТРЕВОГААААААААААААААААААААААААААА\n{server_name} наебнулся")
 
 

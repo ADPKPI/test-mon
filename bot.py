@@ -24,5 +24,4 @@ async def main():
 
 if __name__ == '__main__':
     asyncio.run(main())
-    while True:
-        bot.send_message(chat_id=684172842, text="11")
+    print(1)

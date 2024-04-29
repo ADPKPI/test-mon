@@ -1,4 +1,4 @@
-from bot import send_message_to_chats
+from bot import message_queue
 class FailureHandlingStrategy:
     def handle(self, server_name, check_name):
         pass
@@ -10,6 +10,6 @@ class StrategyFactory:
 
 class NotifyStrategy(FailureHandlingStrategy):
     def handle(self, server_name, check_name):
-        await send_message_to_chats(f"ТРЕВОГААААААААААААААААААААААААААА\n{server_name} наебнулся")
+        message_queue.put_nowait(f"ТРЕВОГА: сервер {server_name} недоступен!")
 
 

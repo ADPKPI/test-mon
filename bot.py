@@ -1,23 +1,25 @@
 import asyncio
-from telegram import Bot
-from telegram.error import TelegramError
-from config import chats
-from dotenv import load_dotenv
 import os
-
+from telegram import Bot
+from dotenv import load_dotenv
+from asyncio.queues import Queue
+from config import chats
 
 load_dotenv()
 TOKEN = os.getenv("MON_BOT_TOKEN")
-
 bot = Bot(TOKEN)
+message_queue = Queue()
 
-async def send_message_to_chats(message):
-    for chat_id in chats:
-        await bot.send_message(chat_id=chat_id, text=message)
+async def process_messages():
+    while True:
+        message = await message_queue.get()
+        text = message
+        for id in chats:
+            await bot.send_message(chat_id=id, text=text)
 
 async def main():
-    await send_message_to_chats("Привет! Это тестовое сообщение.")
+    task = asyncio.create_task(process_messages())
+    await task
 
-# Запускаем асинхронный цикл
 if __name__ == '__main__':
     asyncio.run(main())

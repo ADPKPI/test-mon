@@ -12,6 +12,7 @@ REDIS_URL = "redis://localhost"  # Укажите URL вашего Redis сер�
 
 async def process_messages(redis):
     while True:
+        print(1)
         _, message = await redis.blpop("telegram_queue")
         text = eval(message[1])  # Используйте безопасное преобразование, если данные от внешних источников
         for id in chats:
@@ -24,4 +25,3 @@ async def main():
 
 if __name__ == '__main__':
     asyncio.run(main())
-    print(1)

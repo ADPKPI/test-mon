@@ -223,10 +223,11 @@ class CheckManager:
         with open('aggregate_results.json', 'r') as file:
             data = json.load(file)
         handler = self.handlers.get_strategy(server_name, check_name, data)
-        asyncio.create_task(handler.handle(server_name, check_name))
+        handler.handle(server_name, check_name)
 
     def handle_warning(self, server_name, check_name, value):
-        print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        handler = self.handlers.get_strategy(server_name, check_name, 'warning')
+        handler.handle(server_name, check_name, value)
 
     def save_aggregate_results(self):
         with open("aggregate_results.json", "w") as json_file:

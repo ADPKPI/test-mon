@@ -1,3 +1,4 @@
+import asyncio
 from telegram import Bot
 from telegram.error import TelegramError
 from config import chats
@@ -10,7 +11,13 @@ TOKEN = os.getenv("MON_BOT_TOKEN")
 
 bot = Bot(TOKEN)
 
-def send_message_to_chats(message):
+async def send_message_to_chats(message):
     for chat_id in chats:
-        bot.send_message(chat_id=chat_id, text=message)
+        await bot.send_message(chat_id=chat_id, text=message)
 
+async def main():
+    await send_message_to_chats("Привет! Это тестовое сообщение.")
+
+# Запускаем асинхронный цикл
+if __name__ == '__main__':
+    asyncio.run(main())

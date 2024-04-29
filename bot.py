@@ -1,27 +1,27 @@
+from aiohttp import web
 import asyncio
-import aioredis
-import os
 from telegram import Bot
+import os
 from dotenv import load_dotenv
-from config import chats
 
 load_dotenv()
-TOKEN = os.getenv("MON_BOT_TOKEN")
+TOKEN = os.getenv('MON_BOT_TOKEN')
 bot = Bot(TOKEN)
-REDIS_URL = "redis://localhost"  # Укажите URL вашего Redis сервера
 
-async def process_messages(redis):
-    while True:
-        print(1)
-        _, message = await redis.blpop("telegram_queue")
-        text = eval(message[1])  # Используйте безопасное преобразование, если данные от внешних источников
-        for id in chats:
-            await bot.send_message(chat_id=id, text=text)
+async def handle_alert(request):
+    data = await request.json()
+    chat_id = data.get('chat_id')
+    message = data.get('message')
+    if not chat_id or not message:
+        return web.Response(status=400, text="Bad request: 'chat_id' and 'message' fields are required.")
+    try:
+        await bot.send_message(chat_id=chat_id, text=message)
+        return web.Response(status=200, text="Message sent successfully.")
+    except Exception as e:
+        return web.Response(status=500, text=str(e))
 
-
-async def main():
-    redis = await aioredis.from_url(REDIS_URL, encoding="utf-8", decode_responses=True)
-    await process_messages(redis)
+app = web.Application()
+app.add_routes([web.post('/alert', handle_alert)])
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    web.run_app(app, host='127.0.0.1', port=5001)

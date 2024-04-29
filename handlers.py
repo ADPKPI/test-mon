@@ -1,6 +1,5 @@
-import aioredis
-
-REDIS_URL = "redis://localhost"
+import requests
+from config import chats
 
 class FailureHandlingStrategy:
     def handle(self, server_name, check_name):
@@ -12,9 +11,14 @@ class StrategyFactory:
         return self.notify_strategy
 
 class NotifyStrategy(FailureHandlingStrategy):
-    async def handle(self, server_name, check_name):
-        redis = await aioredis.create_redis_pool(REDIS_URL)
-        message = (123456789, f"ТРЕВОГА: сервер {server_name} недоступен!")
-        await redis.rpush("telegram_queue", str(message))
+    def handle(self, server_name, check_name):
+        url = 'http://127.0.0.1:5001/alert'
+        for id in chats:
+            data = {
+                'chat_id': id,
+                'message': f'Тревога: {server_name} не отвечает!'
+            }
+            response = requests.post(url, json=data)
+
 
 

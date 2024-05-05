@@ -220,7 +220,6 @@ class CheckManager:
             "result": 'Success' if result else 'Failure',
             "response_time": round(response_time, 3) if response_time is not None else None,
         })
-        self.aggregate_results['last-check-time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     def handle_failure(self, server_name, check_name):
         with open('aggregate_results.json', 'r') as file:
@@ -233,6 +232,7 @@ class CheckManager:
         handler.handle(server_name, check_name, value)
 
     def save_aggregate_results(self):
+        self.aggregate_results['last-check-time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         with open("aggregate_results.json", "w") as json_file:
             json_str = json.dumps(self.aggregate_results, indent=4)
             json_file.write(json_str)

@@ -176,8 +176,8 @@ class CheckManager:
                 monitor = ServerPingMonitor(host)
             elif check['type'] == 'telnet':
                 monitor = TelnetMonitor(host, check['port'])
-            elif check['type'] == 'script':
-                monitor = ServiceMonitor(host, 22, server['user'], server['password'], check['script'])
+            elif check['type'] == 'service':
+                monitor = ServiceMonitor(host, 22, server['user'], server['password'], check['service'])
             elif check['type'] == 'cpu':
                 monitor = CPUMonitor()
             elif check['type'] == 'ram':

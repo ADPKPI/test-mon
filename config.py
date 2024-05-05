@@ -7,7 +7,7 @@ resourse_limits = {
 
 servers = [
     {
-        "name": "DB-master1",
+        "name": "DB-master",
         "host": "78.140.189.245",
         "checks": [
             {"type": "ping", "name": "PING"},
@@ -19,32 +19,8 @@ servers = [
         ]
     },
     {
-        "name": "DB-master2",
-        "host": "206.54.191.53",
-        "checks": [
-            {"type": "ping", "name": "PING"},
-            {"type": "telnet", "name": "MySQL", "port": 3306},
-            {"type": "telnet", "name": "SSH", "port": 22},
-            {"type": "cpu", "name": "CPU"},
-            {"type": "ram", "name": "RAM"},
-            {"type": "disk_space", "name": "DISK SPACE"}
-        ]
-    },
-    {
-        "name": "DB-slave1",
+        "name": "DB-slave",
         "host": "206.54.170.119",
-        "checks": [
-            {"type": "ping", "name": "PING"},
-            {"type": "telnet", "name": "MySQL", "port": 3306},
-            {"type": "telnet", "name": "SSH", "port": 22},
-            {"type": "cpu", "name": "CPU"},
-            {"type": "ram", "name": "RAM"},
-            {"type": "disk_space", "name": "DISK SPACE"}
-        ]
-    },
-    {
-        "name": "DB-slave2",
-        "host": "206.54.191.62",
         "checks": [
             {"type": "ping", "name": "PING"},
             {"type": "telnet", "name": "MySQL", "port": 3306},
@@ -62,7 +38,8 @@ servers = [
         "checks": [
             {"type": "ping", "name": "PING"},
             {"type": "telnet", "name": "SSH", "port": 22},
-            {"type": "script", "name": "Bot", "script": "initialization.py"},
+            {"type": "service", "name": "Client Bot", "service":"adp-client-bot.service"},
+            {"type": "service", "name": "Shop Bot", "service":"adp-shop-bot.service"},
             {"type": "cpu", "name": "CPU"},
             {"type": "ram", "name": "RAM"},
             {"type": "disk_space", "name": "DISK SPACE"}
@@ -76,7 +53,7 @@ servers = [
         "checks": [
             {"type": "ping", "name": "PING"},
             {"type": "telnet", "name": "SSH", "port": 22},
-            {"type": "script", "name": "Backup Service", "script": "main.py"},
+            {"type": "service", "name": "Backup Service", "service": "backup.service"},
             {"type": "cpu", "name": "CPU"},
             {"type": "ram", "name": "RAM"},
             {"type": "disk_space", "name": "DISK SPACE"}

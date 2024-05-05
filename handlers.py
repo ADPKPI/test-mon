@@ -12,6 +12,7 @@ class StrategyFactory:
         if(other_checks=='warning'):
             return self.notify_warning_strategy
         else:
+            print(other_checks['last-check-time'])
             return self.notify_failure_strategy
 
 class NotifyFailureStrategy(FailureHandlingStrategy):

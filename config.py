@@ -54,6 +54,7 @@ servers = [
             {"type": "ping", "name": "PING"},
             {"type": "telnet", "name": "SSH", "port": 22},
             {"type": "service", "name": "Backup Service", "service": "backup.service"},
+            {"type": "service", "name": "CRON", "service": "cron.service"},
             {"type": "cpu", "name": "CPU"},
             {"type": "ram", "name": "RAM"},
             {"type": "disk_space", "name": "DISK SPACE"}

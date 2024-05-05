@@ -219,8 +219,8 @@ class CheckManager:
             "check_name": check_name,
             "result": 'Success' if result else 'Failure',
             "response_time": round(response_time, 3) if response_time is not None else None,
-            "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         })
+        self.aggregate_results['last-check-time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     def handle_failure(self, server_name, check_name):
         with open('aggregate_results.json', 'r') as file:

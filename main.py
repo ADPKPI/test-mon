@@ -186,7 +186,7 @@ class CheckManager:
         })
 
     def handle_failure(self, server_name, check_name, check_type):
-        with open('aggregate_results.json', 'r') as file:
+        with open('./aggregate_results.json', 'r') as file:
             data = json.load(file)
         handler = self.handlers.get_strategy(server_name, check_type, data)
         handler.handle(server_name, check_name)
@@ -197,7 +197,7 @@ class CheckManager:
 
     def save_aggregate_results(self):
         self.aggregate_results['last-check-time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        with open("aggregate_results.json", "w") as json_file:
+        with open("./aggregate_results.json", "w") as json_file:
             json_str = json.dumps(self.aggregate_results, indent=4)
             json_file.write(json_str)
 

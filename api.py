@@ -4,7 +4,7 @@ import json
 app = Flask(__name__)
 
 def read_results():
-    with open("aggregate_results.json", "r") as file:
+    with open("./aggregate_results.json", "r") as file:
         data = json.load(file)
     return data
 

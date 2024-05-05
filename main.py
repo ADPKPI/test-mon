@@ -80,46 +80,49 @@ class TelnetMonitor(IMonitorStrategy):
             return end_time - start_time
 
 
-class ScriptMonitor(IMonitorStrategy):
+class ServiceMonitor(IMonitorStrategy):
     """
-       Проверка активности Python скрипта на удаленном сервере через SSH.
-       """
+    Проверка статуса сервиса на удаленном сервере через SSH с использованием systemctl.
+    """
 
-    def __init__(self, hostname, port, username, password, script_name):
+    def __init__(self, hostname, port, username, password, service_name):
         """
         Инициализация монитора.
         :param hostname: Имя хоста или IP адрес удаленного сервера.
         :param port: Порт SSH.
         :param username: Имя пользователя для SSH соединения.
         :param password: Пароль пользователя для SSH соединения.
-        :param script_name: Имя скрипта для мониторинга.
+        :param service_name: Имя сервиса для мониторинга.
         """
         self.hostname = hostname
         self.port = port
         self.username = username
         self.password = password
-        self.script_name = script_name
+        self.service_name = service_name
 
     def check(self) -> bool:
         """
-        Выполняет проверку активности скрипта на удаленном сервере.
-        :return: True, если скрипт активен, иначе False.
+        Выполняет проверку статуса сервиса на удаленном сервере.
+        :return: True, если сервис активен и работает, иначе False.
         """
-        command = f"ps aux | grep python | grep -v grep | grep {self.script_name}"
+        command = f"systemctl is-active {self.service_name}"
         try:
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh.connect(self.hostname, port=self.port, username=self.username, password=self.password)
             stdin, stdout, stderr = ssh.exec_command(command)
-            output = stdout.readlines()
+            output = stdout.read().decode().strip()
             ssh.close()
 
-            return len(output) > 0
+            return output == 'active'
         except Exception as e:
             logging.error(f"Ошибка при подключении или выполнении команды на сервере: {e}")
             return False
 
     def response_time(self) -> float:
+        """
+        Возвращает время ответа сервиса, но в данной реализации всегда возвращает 0.
+        """
         return 0
 
 
@@ -174,7 +177,7 @@ class CheckManager:
             elif check['type'] == 'telnet':
                 monitor = TelnetMonitor(host, check['port'])
             elif check['type'] == 'script':
-                monitor = ScriptMonitor(host, 22, server['user'], server['password'], check['script'])
+                monitor = ServiceMonitor(host, 22, server['user'], server['password'], check['script'])
             elif check['type'] == 'cpu':
                 monitor = CPUMonitor()
             elif check['type'] == 'ram':

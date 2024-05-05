@@ -20,7 +20,7 @@ class NotifyFailureStrategy(FailureHandlingStrategy):
         for id in chats:
             data = {
                 'chat_id': id,
-                'message': f'Тревога: {server_name} не отвечает!'
+                'message': f'Тревога: {server_name} --- {check_name} не отвечает!'
             }
             response = requests.post(url, json=data)
 

@@ -1,4 +1,4 @@
-response_time_limit = 0.5
+response_time_limit = 1
 resourse_limits = {
     "CPU":75,
     "RAM":75,

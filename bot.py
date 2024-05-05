@@ -1,5 +1,4 @@
 from aiohttp import web
-import asyncio
 from telegram import Bot
 import os
 from dotenv import load_dotenv

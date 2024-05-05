@@ -2,29 +2,20 @@
 
 from abc import ABC, abstractmethod
 import subprocess
-import socket
-import requests
-import os
 import psutil
 import telnetlib
 import time
 import paramiko
 from config import servers, resourse_limits, response_time_limit
 from threading import Thread
-from multiprocessing import Process
 import logging
 import json
 from datetime import datetime
-from api import app
 from handlers import StrategyFactory
-import asyncio
 
 
 
 class IMonitorStrategy(ABC):
-    """
-    Интерфейс стратегии мониторинга
-    """
     @abstractmethod
     def check(self) -> bool:
         pass
@@ -34,9 +25,6 @@ class IMonitorStrategy(ABC):
         pass
 
 class ServerPingMonitor(IMonitorStrategy):
-    """
-    Мониторинг сервера через ping
-    """
     def __init__(self, host):
         self.host = host
 
@@ -81,19 +69,8 @@ class TelnetMonitor(IMonitorStrategy):
 
 
 class ServiceMonitor(IMonitorStrategy):
-    """
-    Проверка статуса сервиса на удаленном сервере через SSH с использованием systemctl.
-    """
 
     def __init__(self, hostname, port, username, password, service_name):
-        """
-        Инициализация монитора.
-        :param hostname: Имя хоста или IP адрес удаленного сервера.
-        :param port: Порт SSH.
-        :param username: Имя пользователя для SSH соединения.
-        :param password: Пароль пользователя для SSH соединения.
-        :param service_name: Имя сервиса для мониторинга.
-        """
         self.hostname = hostname
         self.port = port
         self.username = username
@@ -101,10 +78,6 @@ class ServiceMonitor(IMonitorStrategy):
         self.service_name = service_name
 
     def check(self) -> bool:
-        """
-        Выполняет проверку статуса сервиса на удаленном сервере.
-        :return: True, если сервис активен и работает, иначе False.
-        """
         command = f"systemctl is-active {self.service_name}"
         try:
             ssh = paramiko.SSHClient()
@@ -120,30 +93,23 @@ class ServiceMonitor(IMonitorStrategy):
             return False
 
     def response_time(self) -> float:
-        """
-        Возвращает время ответа сервиса, но в данной реализации всегда возвращает 0.
-        """
         return 0
 
 
 class CPUMonitor(IMonitorStrategy):
     def check(self) -> bool:
-        # В данном случае `check` может возвращать True, если удалось получить данные
         return True
 
     def response_time(self) -> float:
-        # Получаем среднюю загрузку CPU за последнюю минуту
         load1, _, _ = psutil.getloadavg()
         cpu_usage = (load1 / psutil.cpu_count()) * 100
         return cpu_usage
 
 class RAMMonitor(IMonitorStrategy):
     def check(self) -> bool:
-        # Аналогично, возвращает True, если получение информации об успешном
         return True
 
     def response_time(self) -> float:
-        # Использование оперативной памяти в процентах
         mem = psutil.virtual_memory()
         return mem.percent
 
@@ -152,11 +118,9 @@ class DiskMonitor(IMonitorStrategy):
         self.disk = disk
 
     def check(self) -> bool:
-        # Возвращает True, если удалось получить информацию о диске
         return True
 
     def response_time(self) -> float:
-        # Использование дискового пространства в процентах для указанного раздела
         usage = psutil.disk_usage(self.disk)
         return usage.percent
 
@@ -246,11 +210,11 @@ class CheckManager:
                     thread.start()
 
             for thread in self.threads:
-                thread.join()  # Ensure all threads have completed
+                thread.join()
 
             self.save_aggregate_results()
-            self.threads = []  # Reset the thread list for the next cycle
-            time.sleep(60)  # Wait for 1 minute before next round of checks
+            self.threads = []
+            time.sleep(60)
 
 def start_monitoring():
     manager = CheckManager()

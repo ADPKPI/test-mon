@@ -8,11 +8,12 @@ class StrategyFactory:
     def __init__(self):
         self.notify_failure_strategy = NotifyFailureStrategy()
         self.notify_warning_strategy = NotifyWarningStrategy()
-    def get_strategy(self, server_name, check_name, other_checks):
+    def get_strategy(self, server_name, check_type, other_checks):
         if(other_checks=='warning'):
             return self.notify_warning_strategy
+        #if(check_type=='service' and other_checks[server_name][''])
         else:
-            print(other_checks['last-check-time'])
+            print(other_checks)
             return self.notify_failure_strategy
 
 class NotifyFailureStrategy(FailureHandlingStrategy):

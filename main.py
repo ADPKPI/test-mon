@@ -192,11 +192,11 @@ class CheckManager:
             self.log_result(server["name"], check["name"], result, response_time)
             if check['type'] not in 'cpu ram disk_space':
                 if not result:
-                    self.handle_failure(server["name"], check["name"])
+                    self.handle_failure(server["name"], check["name"], check['type'])
                 elif response_time >= response_time_limit:
                     self.handle_warning(server["name"], check["name"], response_time)
             elif check['type'] in 'cpu ram disk_space' and response_time >= resourse_limits[check_name]:
-                self.handle_failure(server["name"], check["name"])
+                self.handle_warning(server["name"], check["name"], response_time)
         except Exception as e:
             logging.error(e)
 
@@ -221,10 +221,10 @@ class CheckManager:
             "response_time": round(response_time, 3) if response_time is not None else None,
         })
 
-    def handle_failure(self, server_name, check_name):
+    def handle_failure(self, server_name, check_name, check_type):
         with open('aggregate_results.json', 'r') as file:
             data = json.load(file)
-        handler = self.handlers.get_strategy(server_name, check_name, data)
+        handler = self.handlers.get_strategy(server_name, check_type, data)
         handler.handle(server_name, check_name)
 
     def handle_warning(self, server_name, check_name, value):

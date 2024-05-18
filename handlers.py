@@ -13,6 +13,7 @@ class StrategyFactory:
         self.notify_warning_strategy = NotifyWarningStrategy()
         self.move_services_strategy = MoveServicesStrategy()
     def get_strategy(self, server_name, check_type, other_checks):
+        print('getting')
         if(other_checks=='warning'):
             return self.notify_warning_strategy
         elif(server_name=='TG1'):
@@ -41,7 +42,7 @@ class NotifyWarningStrategy(FailureHandlingStrategy):
             response = requests.post(url, json=data)
 
 class MoveServicesStrategy(FailureHandlingStrategy):
-    def handle(self, server_name, check_name, data):
+    def handle(self, server_name, check_name):
         tg1_server_info = next((server for server in servers if server['name'] == 'TG1'), None)
         tg2_server_info = next((server for server in servers if server['name'] == 'TG2'), None)
         print(1)

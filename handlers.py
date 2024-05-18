@@ -44,7 +44,7 @@ class MoveServicesStrategy(FailureHandlingStrategy):
     def handle(self, server_name, check_name, data):
         tg1_server_info = next((server for server in servers if server['name'] == 'TG1'), None)
         tg2_server_info = next((server for server in servers if server['name'] == 'TG2'), None)
-
+        print(1)
         message = f"❗❗❗ТРИВОГА\n\n{server_name} --- {check_name} НЕ ВІДПОВІДАЄ\n\n"
 
         if self.connect_and_disable_services(tg1_server_info):
@@ -64,6 +64,7 @@ class MoveServicesStrategy(FailureHandlingStrategy):
         try:
             ssh = self.connect_ssh(server_info)
             if ssh:
+                print(2)
                 self.disable_services(ssh, server_info)
                 ssh.close()
                 return True
@@ -75,6 +76,7 @@ class MoveServicesStrategy(FailureHandlingStrategy):
         try:
             ssh = self.connect_ssh(server_info)
             if ssh:
+                print(3)
                 self.enable_services(ssh, services)
                 ssh.close()
                 return True

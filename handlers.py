@@ -52,12 +52,12 @@ class MoveServicesStrategy(FailureHandlingStrategy):
             message += "Служби відключені на TG2\n"
         else:
             message += "Не вдалося під'єднатися до TG1\n"
-
+        print('disable')
         if self.connect_and_enable_services(tg2_server_info, ['adp-client-bot.service', 'adp-shop-bot.service']):
             message += "Служби включені на TG2\n"
         else:
             message += "Не вдалося під'єднатися до TG2\n"
-
+        print('enable')
         self.send_message(message)
 
 

@@ -83,8 +83,6 @@ servers = [
         "checks": [
             {"type": "ping", "name": "PING"},
             {"type": "telnet", "name": "SSH", "port": 22},
-            {"type": "service", "name": "Client Bot", "service": "adp-client-bot.service"},
-            {"type": "service", "name": "Shop Bot", "service": "adp-shop-bot.service"},
             {"type": "cpu", "name": "CPU"},
             {"type": "ram", "name": "RAM"},
             {"type": "disk_space", "name": "DISK SPACE"}
